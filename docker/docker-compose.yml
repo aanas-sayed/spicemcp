@@ -1,14 +1,19 @@
-version: "3.9"
+# Pull simulator images onto the host:
+#   docker compose pull --profile simulators   (Linux / Windows / Intel Mac)
+#   docker compose pull --profile macos        (Apple Silicon Mac)
 
-# Native host deployment (Docker Desktop / Linux)
 services:
-  spicemcp:
-    build: ..
-    stdin_open: true
-    tty: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${MODEL_DIRS:-/dev/null}:/models/user_0:ro
+  ltspice:
+    image: aanas-sayed/docker-ltspice:latest
+    profiles: [simulators]
+    entrypoint: ["true"]
 
-  # Dev-container / CI deployment: Docker socket is mounted from host.
-  # Start with: docker compose -f docker-compose.yml run --rm spicemcp
+  ltspice-macos:
+    image: aanas-sayed/docker-ltspice:macos-latest
+    profiles: [macos]
+    entrypoint: ["true"]
+
+  ngspice:
+    image: aanas-sayed/docker-ngspice:latest
+    profiles: [simulators]
+    entrypoint: ["true"]
