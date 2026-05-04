@@ -1,0 +1,14 @@
+version: "3.9"
+
+# Native host deployment (Docker Desktop / Linux)
+services:
+  spicemcp:
+    build: ..
+    stdin_open: true
+    tty: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${MODEL_DIRS:-/dev/null}:/models/user_0:ro
+
+  # Dev-container / CI deployment: Docker socket is mounted from host.
+  # Start with: docker compose -f docker-compose.yml run --rm spicemcp
