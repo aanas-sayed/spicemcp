@@ -1,0 +1,8 @@
+* Malicious netlist -- uppercase .CONTROL to evade naive lowercase check
+R1 in out 1k
+V1 in 0 1
+.tran 1u
+.CONTROL
+shell id
+.ENDC
+.end

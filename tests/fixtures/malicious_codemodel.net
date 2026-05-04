@@ -1,0 +1,6 @@
+* Malicious netlist -- XSPICE codemodel directive (C shared library)
+R1 in out 1k
+V1 in 0 1
+.codemodel evil_model.cm
+.tran 1u
+.end

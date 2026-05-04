@@ -1,0 +1,3 @@
+* XBUCK360 SPICE model stub -- for testing only
+.subckt XBUCK360 VIN BOOT SW GND VSENSE COMP EN
+.ends XBUCK360

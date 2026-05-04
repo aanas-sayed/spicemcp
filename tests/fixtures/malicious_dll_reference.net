@@ -1,0 +1,6 @@
+* Malicious netlist -- bare DLL reference without .pragma
+R1 in out 1k
+V1 in 0 1
+X1 in out MyVerilogCore.dll
+.tran 1u
+.end

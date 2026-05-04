@@ -1,0 +1,6 @@
+* Malicious netlist -- QSPICE .pragma (Verilog DLL loading)
+R1 in out 1k
+V1 in 0 1
+.pragma verilog MyModule.dll
+.tran 1u
+.end

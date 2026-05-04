@@ -1,0 +1,8 @@
+* Malicious netlist -- set unixcom outside .control block
+* (belt-and-suspenders: caught even outside control block)
+R1 in out 1k
+V1 in 0 1
+set unixcom
+ls -la /
+.tran 1u
+.end

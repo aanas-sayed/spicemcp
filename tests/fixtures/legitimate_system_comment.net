@@ -1,0 +1,10 @@
+* This system uses a Colpitts oscillator topology
+* The shell of each transistor is connected to ground
+.param system_gain=10
+.param shell_resistance=50
+Xsystem1 in out gnd MYMODEL
+Q1 collector base emitter NPN
+R1 in out {system_gain * 100}
+C1 in 0 1n
+.tran 10u
+.end

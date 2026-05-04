@@ -1,0 +1,6 @@
+* Voltage divider -- operating point
+V1 vcc 0 3.3
+R1 vcc out 10k
+R2 out 0 10k
+.op
+.end

@@ -1,0 +1,3 @@
+* XLDO312A SPICE model stub -- for testing only
+.subckt XLDO312A VIN VOUT GND EN
+.ends XLDO312A

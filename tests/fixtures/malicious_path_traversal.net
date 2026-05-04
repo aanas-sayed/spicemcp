@@ -1,0 +1,7 @@
+* Malicious netlist -- path traversal in .include and .lib
+R1 in out 1k
+V1 in 0 1
+.include ../../etc/passwd
+.lib ../../../home/user/.ssh/id_rsa
+.tran 1u
+.end
