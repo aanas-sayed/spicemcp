@@ -21,11 +21,16 @@ def _default_ltspice_image() -> str:
 class DockerLTspice(Simulator):
     """Runs LTspice inside a Docker container with full security isolation.
 
-    Security flags applied on every run: --network=none, --cap-drop=ALL,
-    --security-opt=no-new-privileges, --pids-limit=256 (D-03).
-    --read-only is not used: Wine requires write access to its 1.7 GB WINEPREFIX
-    and the prefix cannot be copied to tmpfs at runtime. Defence-in-depth is
-    maintained by --cap-drop=ALL + no-new-privileges + controlled volume mounts.
+    Security flags applied on every run: --network=none, --cap-drop=ALL plus
+    --cap-add=DAC_OVERRIDE, --security-opt=no-new-privileges, --pids-limit=256.
+    Wine fundamentally needs root inside the container (its WINEPREFIX is at
+    /root/.wine), so we cannot use --user. With --cap-drop=ALL alone, root
+    in the container loses CAP_DAC_OVERRIDE and cannot read/write bind-mounted
+    user directories on Linux (Docker Desktop on macOS papers over this via
+    VirtioFS uid remapping). DAC_OVERRIDE is scoped to the container's own
+    file namespace and does not enable container escape. --read-only is also
+    not used: Wine writes lock files to its 1.7 GB WINEPREFIX which cannot be
+    copied to tmpfs at runtime.
     """
 
     IMAGE: str = _default_ltspice_image()
@@ -64,6 +69,7 @@ class DockerLTspice(Simulator):
             "--platform=linux/amd64",
             "--network=none",
             "--cap-drop=ALL",
+            "--cap-add=DAC_OVERRIDE",
             "--security-opt=no-new-privileges",
             "--memory=2g",
             "--cpus=2",
