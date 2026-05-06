@@ -47,14 +47,32 @@ jobs:
           docker pull aanas0sayed/docker-ltspice:latest
           docker pull aanas0sayed/docker-ngspice:latest
 
+      - name: Debug Docker volume mount
+        shell: bash
+        run: |
+          mkdir -p /tmp/dockertest
+          chmod 777 /tmp/dockertest
+          echo "test content" > /tmp/dockertest/hello.txt
+          chmod 666 /tmp/dockertest/hello.txt
+          echo "=== host: /tmp/dockertest ==="
+          ls -la /tmp/dockertest/
+          id
+          echo "=== container: ngspice as uid 1000, --cap-drop=ALL ==="
+          docker run --rm --cap-drop=ALL --user=1000:1000 \
+            -v /tmp/dockertest:/sim:rw \
+            --entrypoint /bin/sh aanas0sayed/docker-ngspice:latest \
+            -c 'id; ls -la /sim/; cat /sim/hello.txt; touch /sim/from-container.txt && echo OK || echo FAIL'
+          echo "=== container: ltspice as root, --cap-drop=ALL ==="
+          docker run --rm --platform=linux/amd64 --cap-drop=ALL \
+            -v /tmp/dockertest:/sim:rw \
+            --entrypoint /bin/bash aanas0sayed/docker-ltspice:latest \
+            -c 'id; ls -la /sim/; cat /sim/hello.txt; touch /sim/from-ltspice.txt && echo OK || echo FAIL'
+          echo "=== host after: /tmp/dockertest ==="
+          ls -la /tmp/dockertest/
+
       - name: Run integration tests
         shell: bash
         run: |
-          # pytest's root tmpdir is created via tempfile.mkdtemp() which forces 0700
-          # regardless of umask. Docker containers with --cap-drop=ALL lose
-          # CAP_DAC_OVERRIDE and cannot traverse a 0700 dir owned by another uid.
-          # Solution: pre-create a 0777 basetemp and point pytest at it. With
-          # umask 000, all subdirs/files pytest creates within it will also be 0777/0666.
           mkdir -p /tmp/spicemcp-pytest
           chmod 777 /tmp/spicemcp-pytest
           umask 000
