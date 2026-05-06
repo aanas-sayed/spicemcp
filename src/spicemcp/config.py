@@ -11,6 +11,7 @@ from typing import Any
 
 def _default_ltspice_image() -> str:
     from .backends.docker_ltspice import _default_ltspice_image as _backend_default
+
     return _backend_default()
 
 
@@ -30,9 +31,7 @@ class SpiceMCPConfig:
         default_factory=lambda: SimulatorConfig(image=_default_ltspice_image())
     )
     ngspice: SimulatorConfig = field(
-        default_factory=lambda: SimulatorConfig(
-            image="aanas0sayed/docker-ngspice:latest"
-        )
+        default_factory=lambda: SimulatorConfig(image="aanas0sayed/docker-ngspice:latest")
     )
     model_dirs: list[Path] = field(default_factory=list)
     session_ttl_minutes: int = 10
@@ -91,9 +90,7 @@ def load_config(path: Path | None = None) -> SpiceMCPConfig:
         ltspice=ltspice_cfg,
         ngspice=ngspice_cfg,
         model_dirs=[Path(d) for d in data.get("model_dirs", [])],
-        session_ttl_minutes=int(
-            data.get("session_ttl_minutes", defaults.session_ttl_minutes)
-        ),
+        session_ttl_minutes=int(data.get("session_ttl_minutes", defaults.session_ttl_minutes)),
         max_raw_size_mb=int(data.get("max_raw_size_mb", defaults.max_raw_size_mb)),
         max_sessions=int(data.get("max_sessions", defaults.max_sessions)),
     )
@@ -105,8 +102,7 @@ def apply_config_to_backends(config: SpiceMCPConfig) -> None:
     from .backends.docker_ngspice import DockerNGspice
 
     mounts = [
-        {"host": str(d), "container": f"/models/user_{i}"}
-        for i, d in enumerate(config.model_dirs)
+        {"host": str(d), "container": f"/models/user_{i}"} for i, d in enumerate(config.model_dirs)
     ]
 
     if config.ltspice.image:

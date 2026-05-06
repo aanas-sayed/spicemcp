@@ -1,13 +1,11 @@
 """Diagnosis engine tests."""
 
-import pytest
-
 from spicemcp.core.diagnosis import DiagnosisResult, Suggestion, diagnose
-
 
 # ---------------------------------------------------------------------------
 # Pattern matching
 # ---------------------------------------------------------------------------
+
 
 def test_diagnose_timestep_too_small():
     result = diagnose("Error: time step too small")
@@ -62,6 +60,7 @@ def test_diagnose_empty_log():
 # Suggestion structure
 # ---------------------------------------------------------------------------
 
+
 def test_suggestions_are_list():
     result = diagnose("time step too small")
     assert isinstance(result.suggestions, list)
@@ -73,9 +72,7 @@ def test_suggestion_has_required_fields():
     for s in result.suggestions:
         assert isinstance(s, Suggestion)
         assert s.action
-        assert s.severity in (
-            "always_safe", "safe_for_most", "use_with_caution", "fix_required"
-        )
+        assert s.severity in ("always_safe", "safe_for_most", "use_with_caution", "fix_required")
 
 
 def test_timestep_suggestions_have_tradeoffs():
@@ -100,6 +97,7 @@ def test_always_safe_suggestion_for_timestep():
 # ---------------------------------------------------------------------------
 # DiagnosisResult dataclass
 # ---------------------------------------------------------------------------
+
 
 def test_diagnosis_result_default_suggestions():
     d = DiagnosisResult(title="test")

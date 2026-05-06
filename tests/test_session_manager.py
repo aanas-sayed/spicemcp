@@ -1,7 +1,6 @@
 """Session manager tests."""
 
 import time
-from pathlib import Path
 
 import pytest
 
@@ -18,6 +17,7 @@ def mgr():
 # ---------------------------------------------------------------------------
 # create_session
 # ---------------------------------------------------------------------------
+
 
 def test_create_session_returns_sim_session(mgr):
     s = mgr.create_session("ltspice")
@@ -74,6 +74,7 @@ def test_cleaned_sessions_do_not_count_toward_limit(mgr):
 # get_session
 # ---------------------------------------------------------------------------
 
+
 def test_get_session_returns_session(mgr):
     s = mgr.create_session("ltspice")
     found = mgr.get_session(s.session_id)
@@ -96,6 +97,7 @@ def test_get_session_resets_last_accessed(mgr):
 # touch
 # ---------------------------------------------------------------------------
 
+
 def test_touch_updates_last_accessed(mgr):
     s = mgr.create_session("ltspice")
     before = s.last_accessed
@@ -112,6 +114,7 @@ def test_touch_unknown_session_is_noop(mgr):
 # list_sessions
 # ---------------------------------------------------------------------------
 
+
 def test_list_sessions_empty(mgr):
     assert mgr.list_sessions() == []
 
@@ -127,6 +130,7 @@ def test_list_sessions_returns_all(mgr):
 # ---------------------------------------------------------------------------
 # cleanup_session
 # ---------------------------------------------------------------------------
+
 
 def test_cleanup_session_removes_raw_file(mgr, tmp_path):
     s = mgr.create_session("ltspice")
@@ -199,6 +203,7 @@ def test_cleanup_unknown_session_returns_zero(mgr):
 # TTL / expiry
 # ---------------------------------------------------------------------------
 
+
 def test_is_expired_fresh_session(mgr):
     s = mgr.create_session("ltspice")
     assert not mgr._is_expired(s)
@@ -241,6 +246,7 @@ def test_reap_expired_does_not_remove_fresh(mgr):
 
 def test_reap_expired_only_removes_stale(mgr):
     from datetime import timedelta
+
     from spicemcp.core.session_manager import _now
 
     old = mgr.create_session("ltspice")
@@ -254,6 +260,7 @@ def test_reap_expired_only_removes_stale(mgr):
 # ---------------------------------------------------------------------------
 # stop / reaper thread
 # ---------------------------------------------------------------------------
+
 
 def test_stop_terminates_reaper_thread():
     mgr = SessionManager(reaper_interval=9999)

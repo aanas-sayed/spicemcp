@@ -50,8 +50,7 @@ class DockerLTspice(Simulator):
     ) -> int:
         if not cls.is_available():
             raise SpiceSimulatorError(
-                f"Docker image '{cls.IMAGE}' not found."
-                f" Pull it with: docker pull {cls.IMAGE}"
+                f"Docker image '{cls.IMAGE}' not found. Pull it with: docker pull {cls.IMAGE}"
             )
 
         netlist_file = Path(netlist_file)
@@ -59,14 +58,18 @@ class DockerLTspice(Simulator):
         filename = netlist_file.name
 
         cmd = [
-            "docker", "run", "--rm",
+            "docker",
+            "run",
+            "--rm",
             "--platform=linux/amd64",
             "--network=none",
             "--cap-drop=ALL",
             "--security-opt=no-new-privileges",
-            "--memory=2g", "--cpus=2",
+            "--memory=2g",
+            "--cpus=2",
             "--pids-limit=256",
-            "-v", f"{work_dir}:/sim:rw",
+            "-v",
+            f"{work_dir}:/sim:rw",
         ]
 
         for mount in cls._model_mounts:
@@ -76,7 +79,7 @@ class DockerLTspice(Simulator):
         ltspice_exe = "/root/.wine/drive_c/Program Files/ADI/LTspice/LTspice.exe"
         bash_cmd = (
             f'timeout 120 wine "{ltspice_exe}" -b -run "{netlist_win}" || true; '
-            f'wineserver --wait 2>/dev/null || true'
+            f"wineserver --wait 2>/dev/null || true"
         )
         cmd.extend([cls.IMAGE, "/bin/bash", "-c", bash_cmd])
 

@@ -34,6 +34,7 @@ mcp = FastMCP("SpiceMCP", lifespan=_lifespan)
 # Tool registrations
 # ---------------------------------------------------------------------------
 
+
 @mcp.tool()
 def simulate_netlist(
     simulator: str,
@@ -50,6 +51,7 @@ def simulate_netlist(
     timeout_s: simulation timeout in seconds, max 600
     """
     from spicemcp.tools.simulate_netlist import simulate_netlist as _run
+
     return _run(simulator=simulator, netlist=netlist, filename=filename, timeout_s=timeout_s)
 
 
@@ -67,6 +69,7 @@ def simulate(
     timeout_s: simulation timeout in seconds, max 600
     """
     from spicemcp.tools.simulate import simulate as _run
+
     return _run(session_id=session_id, timeout_s=timeout_s)
 
 
@@ -86,6 +89,7 @@ def write_netlist(
     filename: optional filename, default 'circuit.net'
     """
     from spicemcp.tools.netlist import write_netlist as _run
+
     return _run(session_id=session_id, netlist=netlist, filename=filename)
 
 
@@ -99,6 +103,7 @@ def create_session(simulator: str) -> dict[str, Any]:
     simulator: 'ltspice' | 'ngspice'
     """
     from spicemcp.tools.session import create_session as _run
+
     return _run(simulator=simulator)
 
 
@@ -106,6 +111,7 @@ def create_session(simulator: str) -> dict[str, Any]:
 def list_sessions() -> dict[str, Any]:
     """List all active simulation sessions with their status, TTL, and file sizes."""
     from spicemcp.tools.session import list_sessions as _run
+
     return _run()
 
 
@@ -122,6 +128,7 @@ def cleanup_session(
     delete_session: if True, remove the session and all files entirely
     """
     from spicemcp.tools.session import cleanup_session as _run
+
     return _run(session_id=session_id, keep_log=keep_log, delete_session=delete_session)
 
 

@@ -14,6 +14,7 @@ from spicelib.log.ltsteps import LTSpiceLogReader
 # Domain detection
 # ---------------------------------------------------------------------------
 
+
 def detect_domain(raw_path: Path) -> str:
     """Return canonical domain string from raw file header.
 
@@ -45,6 +46,7 @@ def list_signals(raw_path: Path) -> list[str]:
 # Transient stats
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TranStats:
     min: float
@@ -64,9 +66,9 @@ def _tran_stats(axis: np.ndarray, wave: np.ndarray) -> TranStats:
     integral = float(np.trapezoid(wave, axis))
     mean_dc = integral / dt if dt != 0 else float(np.mean(wave))
     if dt != 0:
-        mean_rms = float(np.sqrt(np.trapezoid(wave ** 2, axis) / dt))
+        mean_rms = float(np.sqrt(np.trapezoid(wave**2, axis) / dt))
     else:
-        mean_rms = float(np.sqrt(np.mean(wave ** 2)))
+        mean_rms = float(np.sqrt(np.mean(wave**2)))
     i_min = int(np.argmin(wave))
     i_max = int(np.argmax(wave))
     return TranStats(
@@ -86,6 +88,7 @@ def _tran_stats(axis: np.ndarray, wave: np.ndarray) -> TranStats:
 # ---------------------------------------------------------------------------
 # AC stats
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AcStats:
@@ -145,6 +148,7 @@ def _ac_stats(freq: np.ndarray, wave: np.ndarray) -> AcStats:
 # DC stats
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class DcStats:
     min: float
@@ -172,6 +176,7 @@ def _dc_stats(sweep: np.ndarray, wave: np.ndarray) -> DcStats:
 # Noise stats
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class NoiseStats:
     peak_spectral_density: float
@@ -190,6 +195,7 @@ def _noise_stats(freq: np.ndarray, wave: np.ndarray) -> NoiseStats:
 # ---------------------------------------------------------------------------
 # Threshold crossing helper
 # ---------------------------------------------------------------------------
+
 
 def _find_threshold_crossing(
     x: np.ndarray,
@@ -229,6 +235,7 @@ def _find_threshold_crossing(
 # Power computation
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class PowerStats:
     mean_power: float
@@ -245,9 +252,9 @@ def _power_stats(
     dt = axis[-1] - axis[0]
     mean_p = float(np.trapezoid(p, axis) / dt) if dt != 0 else float(np.mean(p))
     if dt != 0:
-        rms_p = float(np.sqrt(np.trapezoid(p ** 2, axis) / dt))
+        rms_p = float(np.sqrt(np.trapezoid(p**2, axis) / dt))
     else:
-        rms_p = float(np.sqrt(np.mean(p ** 2)))
+        rms_p = float(np.sqrt(np.mean(p**2)))
     return PowerStats(
         mean_power=mean_p,
         peak_power=float(np.max(np.abs(p))),
@@ -258,6 +265,7 @@ def _power_stats(
 # ---------------------------------------------------------------------------
 # Window slicing
 # ---------------------------------------------------------------------------
+
 
 def _slice(axis: np.ndarray, wave: np.ndarray, x_start: float | None, x_end: float | None):
     """Return (axis_slice, wave_slice) restricted to [x_start, x_end]."""
@@ -274,6 +282,7 @@ def _slice(axis: np.ndarray, wave: np.ndarray, x_start: float | None, x_end: flo
 # ---------------------------------------------------------------------------
 # Public API: measure
 # ---------------------------------------------------------------------------
+
 
 def measure_signal(
     raw_path: Path,
@@ -370,6 +379,7 @@ def measure_signal(
 # ---------------------------------------------------------------------------
 # Public API: log parsing
 # ---------------------------------------------------------------------------
+
 
 def parse_meas_results(log_path: Path) -> dict[str, Any]:
     """Parse .MEAS results from an LTSpice log file.

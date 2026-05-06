@@ -116,16 +116,18 @@ def sanitize(
         # --- .control block tracking ---
         if _RE_CONTROL_START.match(stripped):
             in_control = True
-            violations.append(SanitizerViolation(
-                line=lineno,
-                type=ViolationType.CONTROL_BLOCK,
-                content=stripped,
-                fix=(
-                    "ngspice .control blocks can execute arbitrary shell commands and are"
-                    " not permitted. Move measurement directives to .MEAS statements in the"
-                    " netlist body. Example: .meas tran vout_max MAX V(out)"
-                ),
-            ))
+            violations.append(
+                SanitizerViolation(
+                    line=lineno,
+                    type=ViolationType.CONTROL_BLOCK,
+                    content=stripped,
+                    fix=(
+                        "ngspice .control blocks can execute arbitrary shell commands and are"
+                        " not permitted. Move measurement directives to .MEAS statements in the"
+                        " netlist body. Example: .meas tran vout_max MAX V(out)"
+                    ),
+                )
+            )
             continue
 
         if _RE_CONTROL_END.match(stripped):
@@ -138,50 +140,58 @@ def sanitize(
 
         # --- set unixcom (D-01: also blocks outside .control as a belt-and-suspenders) ---
         if _RE_UNIXCOM.match(stripped):
-            violations.append(SanitizerViolation(
-                line=lineno,
-                type=ViolationType.UNIXCOM,
-                content=stripped,
-                fix=(
-                    "'set unixcom' causes ngspice to treat unknown commands as shell"
-                    " invocations. This directive is not permitted."
-                ),
-            ))
+            violations.append(
+                SanitizerViolation(
+                    line=lineno,
+                    type=ViolationType.UNIXCOM,
+                    content=stripped,
+                    fix=(
+                        "'set unixcom' causes ngspice to treat unknown commands as shell"
+                        " invocations. This directive is not permitted."
+                    ),
+                )
+            )
             continue
 
         # --- XSPICE codemodel / load ---
         if _RE_CODEMODEL.match(stripped):
-            violations.append(SanitizerViolation(
-                line=lineno,
-                type=ViolationType.CODEMODEL,
-                content=stripped,
-                fix=(
-                    "XSPICE codemodel and .load directives load C shared libraries as"
-                    " arbitrary code and are not permitted."
-                ),
-            ))
+            violations.append(
+                SanitizerViolation(
+                    line=lineno,
+                    type=ViolationType.CODEMODEL,
+                    content=stripped,
+                    fix=(
+                        "XSPICE codemodel and .load directives load C shared libraries as"
+                        " arbitrary code and are not permitted."
+                    ),
+                )
+            )
             continue
 
         # --- QSPICE .pragma and DLL references ---
         if _RE_PRAGMA.match(stripped):
-            violations.append(SanitizerViolation(
-                line=lineno,
-                type=ViolationType.VERILOG_DLL,
-                content=stripped,
-                fix=(
-                    ".pragma directives are used by QSPICE for Verilog DLL loading and"
-                    " are not permitted."
-                ),
-            ))
+            violations.append(
+                SanitizerViolation(
+                    line=lineno,
+                    type=ViolationType.VERILOG_DLL,
+                    content=stripped,
+                    fix=(
+                        ".pragma directives are used by QSPICE for Verilog DLL loading and"
+                        " are not permitted."
+                    ),
+                )
+            )
             continue
 
         if _RE_DLL.search(stripped):
-            violations.append(SanitizerViolation(
-                line=lineno,
-                type=ViolationType.VERILOG_DLL,
-                content=stripped,
-                fix="DLL file references are not permitted.",
-            ))
+            violations.append(
+                SanitizerViolation(
+                    line=lineno,
+                    type=ViolationType.VERILOG_DLL,
+                    content=stripped,
+                    fix="DLL file references are not permitted.",
+                )
+            )
             continue
 
         # --- .lib / .include path checks ---
@@ -193,30 +203,34 @@ def sanitize(
 
             # URL-based .lib (LTspice supports this natively -- D-03)
             if _RE_URL.match(path_arg):
-                violations.append(SanitizerViolation(
-                    line=lineno,
-                    type=ViolationType.LIB_URL,
-                    content=stripped,
-                    fix=(
-                        "URL-based .lib references are not permitted. Place the model file"
-                        " in a configured model_dirs directory and use a relative or"
-                        " absolute local path."
-                    ),
-                ))
+                violations.append(
+                    SanitizerViolation(
+                        line=lineno,
+                        type=ViolationType.LIB_URL,
+                        content=stripped,
+                        fix=(
+                            "URL-based .lib references are not permitted. Place the model file"
+                            " in a configured model_dirs directory and use a relative or"
+                            " absolute local path."
+                        ),
+                    )
+                )
                 continue
 
             # Path traversal (.. in any position)
             if ".." in path_arg:
-                violations.append(SanitizerViolation(
-                    line=lineno,
-                    type=ViolationType.PATH_TRAVERSAL,
-                    content=stripped,
-                    fix=(
-                        "'..' is not allowed in .include/.lib paths. Use paths within"
-                        " the work directory or add the model directory to model_dirs"
-                        " in your config."
-                    ),
-                ))
+                violations.append(
+                    SanitizerViolation(
+                        line=lineno,
+                        type=ViolationType.PATH_TRAVERSAL,
+                        content=stripped,
+                        fix=(
+                            "'..' is not allowed in .include/.lib paths. Use paths within"
+                            " the work directory or add the model directory to model_dirs"
+                            " in your config."
+                        ),
+                    )
+                )
                 continue
 
             # Delegate to model resolver for absolute and bare-filename paths.
@@ -225,16 +239,18 @@ def sanitize(
             ref = resolver.resolve(stripped, path_arg)
 
             if ref.status == "rejected":
-                violations.append(SanitizerViolation(
-                    line=lineno,
-                    type=ViolationType.PATH_REJECTED,
-                    content=stripped,
-                    fix=(
-                        f"Absolute path '{path_arg}' is not within any configured model"
-                        " directory. Add its parent directory to model_dirs in your config,"
-                        " or use a relative path."
-                    ),
-                ))
+                violations.append(
+                    SanitizerViolation(
+                        line=lineno,
+                        type=ViolationType.PATH_REJECTED,
+                        content=stripped,
+                        fix=(
+                            f"Absolute path '{path_arg}' is not within any configured model"
+                            " directory. Add its parent directory to model_dirs in your config,"
+                            " or use a relative path."
+                        ),
+                    )
+                )
                 # Still record the reference so callers can see the similar-files list
                 model_references.append(ref)
                 continue

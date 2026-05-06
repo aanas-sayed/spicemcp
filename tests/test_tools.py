@@ -15,6 +15,7 @@ from spicemcp.tools.simulate import simulate
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def fresh_globals():
     """Give every test its own SessionManager and reset globals afterward."""
@@ -29,6 +30,7 @@ def fresh_globals():
 # ---------------------------------------------------------------------------
 # create_session
 # ---------------------------------------------------------------------------
+
 
 def test_create_session_ltspice():
     r = create_session("ltspice")
@@ -68,6 +70,7 @@ def test_create_session_max_sessions_enforced():
 # list_sessions
 # ---------------------------------------------------------------------------
 
+
 def test_list_sessions_empty():
     r = list_sessions()
     assert r["sessions"] == []
@@ -102,6 +105,7 @@ def test_list_sessions_fields():
 # ---------------------------------------------------------------------------
 # cleanup_session
 # ---------------------------------------------------------------------------
+
 
 def test_cleanup_session_not_found_is_idempotent():
     r = cleanup_session("nonexistent123")
@@ -142,21 +146,10 @@ def test_cleanup_session_delete():
 # ---------------------------------------------------------------------------
 
 VALID_NETLIST = (
-    "* RC filter\n"
-    "V1 in 0 PULSE(0 5 0 10n 10n 500n 1u)\n"
-    "R1 in out 1k\n"
-    "C1 out 0 1n\n"
-    ".tran 5u\n"
-    ".end\n"
+    "* RC filter\nV1 in 0 PULSE(0 5 0 10n 10n 500n 1u)\nR1 in out 1k\nC1 out 0 1n\n.tran 5u\n.end\n"
 )
 
-MALICIOUS_NETLIST = (
-    "* Malicious\n"
-    ".control\n"
-    "shell rm -rf /\n"
-    ".endc\n"
-    ".end\n"
-)
+MALICIOUS_NETLIST = "* Malicious\n.control\nshell rm -rf /\n.endc\n.end\n"
 
 
 def test_write_netlist_session_not_found():
@@ -239,6 +232,7 @@ def test_write_netlist_overwrites_previous():
 # ---------------------------------------------------------------------------
 # simulate — error path only (no Docker)
 # ---------------------------------------------------------------------------
+
 
 def test_simulate_session_not_found():
     r = simulate("nonexistent000")

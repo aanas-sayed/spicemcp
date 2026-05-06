@@ -6,9 +6,6 @@ import numpy as np
 import pytest
 
 from spicemcp.core.analysis_engine import (
-    AcStats,
-    DcStats,
-    TranStats,
     _ac_stats,
     _dc_stats,
     _find_threshold_crossing,
@@ -19,11 +16,12 @@ from spicemcp.core.analysis_engine import (
     measure_signal,
     parse_log_summary,
 )
-
+from spicemcp.core.cache import SimCache, cache_key, is_monte_carlo
 
 # ---------------------------------------------------------------------------
 # detect_domain
 # ---------------------------------------------------------------------------
+
 
 def test_detect_domain_tran(tran_raw):
     assert detect_domain(tran_raw) == "tran"
@@ -36,6 +34,7 @@ def test_detect_domain_ac(ac_raw):
 # ---------------------------------------------------------------------------
 # list_signals
 # ---------------------------------------------------------------------------
+
 
 def test_list_signals_tran(tran_raw):
     names = list_signals(tran_raw)
@@ -51,6 +50,7 @@ def test_list_signals_ac(ac_raw):
 # ---------------------------------------------------------------------------
 # _tran_stats — pure numpy unit tests
 # ---------------------------------------------------------------------------
+
 
 def test_tran_stats_sine_mean_dc_near_zero():
     t = np.linspace(0, 10e-3, 10001)
@@ -108,6 +108,7 @@ def test_tran_stats_integral():
 # _ac_stats — pure numpy unit tests
 # ---------------------------------------------------------------------------
 
+
 def test_ac_stats_gain_at_dc_is_zero_db():
     freq = np.logspace(0, 6, 500)
     h = np.ones(len(freq), dtype=complex)
@@ -153,6 +154,7 @@ def test_ac_stats_phase_margin_unity_gain():
 # _dc_stats — pure numpy unit tests
 # ---------------------------------------------------------------------------
 
+
 def test_dc_stats_linear_sweep():
     sweep = np.linspace(0, 5, 101)
     v = sweep * 0.5  # voltage divider
@@ -175,11 +177,12 @@ def test_dc_stats_x_at_extremes():
 # _find_threshold_crossing
 # ---------------------------------------------------------------------------
 
+
 def test_crossing_rising_edge():
     x = np.linspace(0, 1, 1001)
     y = np.sin(2 * np.pi * x)  # rises through 0 at x=0
     # First rising crossing of 0: at x~0
-    c = _find_threshold_crossing(x, y, 0.0, edge="rising")
+    _find_threshold_crossing(x, y, 0.0, edge="rising")
     # sin crosses 0 rising at 0 and 1.0, so first is 0 (degenerate: starts at 0)
     # Let's check at x=0.5: sin is 0 falling
     c2 = _find_threshold_crossing(x, y, 0.0, edge="falling")
@@ -213,6 +216,7 @@ def test_crossing_interpolates():
 # _power_stats
 # ---------------------------------------------------------------------------
 
+
 def test_power_stats_dc():
     t = np.linspace(0, 1e-3, 1001)
     v = np.full_like(t, 5.0)
@@ -234,6 +238,7 @@ def test_power_stats_sine_rms():
 # ---------------------------------------------------------------------------
 # measure_signal (end-to-end via raw files)
 # ---------------------------------------------------------------------------
+
 
 def test_measure_tran_stats(tran_raw):
     r = measure_signal(tran_raw, "V(out)", "stats")
@@ -287,6 +292,7 @@ def test_measure_unknown_operation_raises(tran_raw):
 # parse_log_summary
 # ---------------------------------------------------------------------------
 
+
 def test_parse_log_summary_extracts_errors(tmp_path):
     log = tmp_path / "sim.log"
     log.write_text("Starting simulation\nError: singular matrix\nDone\n")
@@ -316,8 +322,6 @@ def test_parse_log_summary_no_errors(tmp_path):
 # ---------------------------------------------------------------------------
 # Cache module (tested here for proximity to analysis context)
 # ---------------------------------------------------------------------------
-
-from spicemcp.core.cache import SimCache, cache_key, is_monte_carlo
 
 
 def test_is_monte_carlo_detects_mc():
@@ -359,6 +363,7 @@ def test_sim_cache_miss_returns_none():
 
 def test_sim_cache_expiry():
     import time
+
     c = SimCache(ttl_minutes=0.0001)  # ~6ms TTL
     c.set("k", "value")
     time.sleep(0.05)

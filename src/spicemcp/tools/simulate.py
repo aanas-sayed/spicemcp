@@ -52,8 +52,7 @@ def simulate(
             "warnings": None,
             "diagnosis": None,
             "error": (
-                f"Session '{session_id}' has no netlist."
-                " Call write_netlist before simulate."
+                f"Session '{session_id}' has no netlist. Call write_netlist before simulate."
             ),
         }
 

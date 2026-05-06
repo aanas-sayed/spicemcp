@@ -19,7 +19,7 @@ def _now() -> datetime:
 class SimSession:
     session_id: str
     simulator: str
-    status: str       # created | running | completed | failed | cleaned | deleted
+    status: str  # created | running | completed | failed | cleaned | deleted
     work_dir: Path
     netlist_path: Path | None = None
     raw_path: Path | None = None
@@ -63,10 +63,7 @@ class SessionManager:
 
     def create_session(self, simulator: str) -> SimSession:
         with self._lock:
-            active = [
-                s for s in self._sessions.values()
-                if s.status not in ("cleaned", "deleted")
-            ]
+            active = [s for s in self._sessions.values() if s.status not in ("cleaned", "deleted")]
             if len(active) >= self.max_sessions:
                 raise RuntimeError(
                     f"Maximum concurrent sessions ({self.max_sessions}) reached."
@@ -156,9 +153,7 @@ class SessionManager:
     def _reap_expired(self) -> int:
         """Synchronously delete all expired sessions. Returns count reaped."""
         with self._lock:
-            expired = [
-                sid for sid, s in self._sessions.items() if self._is_expired(s)
-            ]
+            expired = [sid for sid, s in self._sessions.items() if self._is_expired(s)]
         for sid in expired:
             self.cleanup_session(sid, keep_log=False, delete_session=True)
         return len(expired)

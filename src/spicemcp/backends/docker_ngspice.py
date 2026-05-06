@@ -39,8 +39,7 @@ class DockerNGspice(Simulator):
     ) -> int:
         if not cls.is_available():
             raise SpiceSimulatorError(
-                f"Docker image '{cls.IMAGE}' not found."
-                f" Pull it with: docker pull {cls.IMAGE}"
+                f"Docker image '{cls.IMAGE}' not found. Pull it with: docker pull {cls.IMAGE}"
             )
 
         netlist_file = Path(netlist_file)
@@ -49,16 +48,21 @@ class DockerNGspice(Simulator):
         stem = netlist_file.stem
 
         cmd = [
-            "docker", "run", "--rm",
+            "docker",
+            "run",
+            "--rm",
             "--read-only",
-            "--tmpfs", "/tmp:size=512m",
+            "--tmpfs",
+            "/tmp:size=512m",
             "--network=none",
             "--cap-drop=ALL",
             "--security-opt=no-new-privileges",
-            "--memory=2g", "--cpus=2",
+            "--memory=2g",
+            "--cpus=2",
             "--pids-limit=256",
             "--user=1000:1000",
-            "-v", f"{work_dir}:/sim:rw",
+            "-v",
+            f"{work_dir}:/sim:rw",
         ]
 
         for mount in cls._model_mounts:
@@ -67,12 +71,16 @@ class DockerNGspice(Simulator):
         ngspice_cmd = []
         if cls._compatibility_mode:
             ngspice_cmd.extend(["-D", f"ngbehavior={cls._compatibility_mode}"])
-        ngspice_cmd.extend([
-            "-b",
-            "-o", f"/sim/{stem}.log",
-            "-r", f"/sim/{stem}.raw",
-            f"/sim/{filename}",
-        ])
+        ngspice_cmd.extend(
+            [
+                "-b",
+                "-o",
+                f"/sim/{stem}.log",
+                "-r",
+                f"/sim/{stem}.raw",
+                f"/sim/{filename}",
+            ]
+        )
 
         cmd.extend([cls.IMAGE] + ngspice_cmd)
 

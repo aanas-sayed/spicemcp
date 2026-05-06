@@ -189,10 +189,7 @@ def simulate_netlist(
             "warnings": [],
             "violations": [],
             "diagnosis": None,
-            "error": (
-                f"Unknown simulator '{simulator}'."
-                " Valid values: 'ltspice', 'ngspice'."
-            ),
+            "error": (f"Unknown simulator '{simulator}'. Valid values: 'ltspice', 'ngspice'."),
         }
 
     timeout_s = min(int(timeout_s), 600)

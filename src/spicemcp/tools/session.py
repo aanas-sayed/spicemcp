@@ -23,10 +23,7 @@ def create_session(simulator: str) -> dict:
             "simulator": simulator,
             "status": None,
             "expires_in_minutes": None,
-            "error": (
-                f"Unknown simulator '{simulator}'."
-                " Valid values: 'ltspice', 'ngspice'."
-            ),
+            "error": (f"Unknown simulator '{simulator}'. Valid values: 'ltspice', 'ngspice'."),
         }
 
     manager = _globals.manager
@@ -60,26 +57,24 @@ def list_sessions() -> dict:
     rows = []
     total_raw_mb = 0.0
     for s in sessions:
-        expires_delta = (
-            s.last_accessed
-            + timedelta(minutes=manager.ttl_minutes)
-            - _now()
-        )
+        expires_delta = s.last_accessed + timedelta(minutes=manager.ttl_minutes) - _now()
         expires_in_seconds = max(0, int(expires_delta.total_seconds()))
         has_raw = s.raw_path is not None and s.raw_path.exists()
-        rows.append({
-            "session_id": s.session_id,
-            "simulator": s.simulator,
-            "status": s.status,
-            "domain": s.domain,
-            "created_at": s.created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "last_accessed_at": s.last_accessed.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "expires_in_seconds": expires_in_seconds,
-            "has_raw_file": has_raw,
-            "raw_file_size_mb": round(s.raw_file_size_mb, 3),
-            "has_meas_results": bool(s.meas_results),
-            "simulation_required": s.simulation_required,
-        })
+        rows.append(
+            {
+                "session_id": s.session_id,
+                "simulator": s.simulator,
+                "status": s.status,
+                "domain": s.domain,
+                "created_at": s.created_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "last_accessed_at": s.last_accessed.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "expires_in_seconds": expires_in_seconds,
+                "has_raw_file": has_raw,
+                "raw_file_size_mb": round(s.raw_file_size_mb, 3),
+                "has_meas_results": bool(s.meas_results),
+                "simulation_required": s.simulation_required,
+            }
+        )
         total_raw_mb += s.raw_file_size_mb
 
     return {
