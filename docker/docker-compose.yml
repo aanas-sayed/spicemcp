@@ -4,16 +4,18 @@
 
 services:
   ltspice:
-    image: aanas-sayed/docker-ltspice:latest
+    image: aanas0sayed/docker-ltspice:latest
+    platform: linux/amd64
     profiles: [simulators]
     entrypoint: ["true"]
 
   ltspice-macos:
-    image: aanas-sayed/docker-ltspice:macos-latest
+    image: aanas0sayed/docker-ltspice:macos-latest
+    platform: linux/amd64
     profiles: [macos]
     entrypoint: ["true"]
 
   ngspice:
-    image: aanas-sayed/docker-ngspice:latest
-    profiles: [simulators]
+    image: aanas0sayed/docker-ngspice:latest
+    profiles: [simulators, macos]
     entrypoint: ["true"]

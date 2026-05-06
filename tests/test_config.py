@@ -29,27 +29,18 @@ def test_default_ltspice_backend_is_docker(tmp_path):
 def test_default_ngspice_backend_is_docker(tmp_path):
     config = load_config(path=tmp_path / "nonexistent.json")
     assert config.ngspice.backend == "docker"
-    assert config.ngspice.image == "aanas-sayed/docker-ngspice:latest"
+    assert config.ngspice.image == "aanas0sayed/docker-ngspice:latest"
 
 def test_apple_silicon_ltspice_image(monkeypatch):
     monkeypatch.setattr("sys.platform", "darwin")
     monkeypatch.setattr("platform.machine", lambda: "arm64")
-    # Re-import to get fresh defaults computed with patched platform
-    import importlib
-    import spicemcp.config as cfg_mod
-    importlib.reload(cfg_mod)
-    image = cfg_mod._default_ltspice_image()
-    assert "macos-latest" in image
-    importlib.reload(cfg_mod)  # restore
+    from spicemcp.backends.docker_ltspice import _default_ltspice_image
+    assert "macos-latest" in _default_ltspice_image()
 
 def test_non_apple_silicon_ltspice_image(monkeypatch):
     monkeypatch.setattr("sys.platform", "linux")
-    import importlib
-    import spicemcp.config as cfg_mod
-    importlib.reload(cfg_mod)
-    image = cfg_mod._default_ltspice_image()
-    assert image == "aanas-sayed/docker-ltspice:latest"
-    importlib.reload(cfg_mod)
+    from spicemcp.backends.docker_ltspice import _default_ltspice_image
+    assert _default_ltspice_image() == "aanas0sayed/docker-ltspice:latest"
 
 
 # ---------------------------------------------------------------------------

@@ -16,7 +16,7 @@ class DockerNGspice(Simulator):
     --cap-drop=ALL provide defence-in-depth at the container level (D-03).
     """
 
-    IMAGE: str = "aanas-sayed/docker-ngspice:latest"
+    IMAGE: str = "aanas0sayed/docker-ngspice:latest"
     spice_exe: list[str] = ["docker"]
     process_name: str = "docker"
     _model_mounts: list[dict] = []
@@ -64,7 +64,7 @@ class DockerNGspice(Simulator):
         for mount in cls._model_mounts:
             cmd.extend(["-v", f"{mount['host']}:{mount['container']}:ro"])
 
-        ngspice_cmd = ["ngspice"]
+        ngspice_cmd = []
         if cls._compatibility_mode:
             ngspice_cmd.extend(["-D", f"ngbehavior={cls._compatibility_mode}"])
         ngspice_cmd.extend([

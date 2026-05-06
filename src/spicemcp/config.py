@@ -4,20 +4,14 @@ from __future__ import annotations
 
 import json
 import os
-import platform
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 
 def _default_ltspice_image() -> str:
-    # Apple Silicon Macs need the macos-latest tag (pinned to Wine 9.0).
-    # Wine 10+ aborts with an anon_mmap_fixed assertion failure under QEMU
-    # user-mode emulation on 16 KB page-size hosts. See ARCHITECTURE.md.
-    if sys.platform == "darwin" and platform.machine() == "arm64":
-        return "aanas-sayed/docker-ltspice:macos-latest"
-    return "aanas-sayed/docker-ltspice:latest"
+    from .backends.docker_ltspice import _default_ltspice_image as _backend_default
+    return _backend_default()
 
 
 @dataclass
@@ -37,7 +31,7 @@ class SpiceMCPConfig:
     )
     ngspice: SimulatorConfig = field(
         default_factory=lambda: SimulatorConfig(
-            image="aanas-sayed/docker-ngspice:latest"
+            image="aanas0sayed/docker-ngspice:latest"
         )
     )
     model_dirs: list[Path] = field(default_factory=list)
