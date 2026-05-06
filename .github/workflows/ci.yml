@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -47,4 +48,11 @@ jobs:
           docker pull aanas0sayed/docker-ngspice:latest
 
       - name: Run integration tests
-        run: uv run pytest tests/integration -v
+        shell: bash
+        run: |
+          # umask 000: pytest temp dirs/files created world-accessible (0777/0666)
+          # so Docker containers running as any uid can read/write them even with
+          # --cap-drop=ALL (which removes CAP_DAC_OVERRIDE, preventing uid 0
+          # from bypassing file permissions owned by the runner uid).
+          umask 000
+          uv run pytest tests/integration -v
