@@ -50,9 +50,12 @@ jobs:
       - name: Run integration tests
         shell: bash
         run: |
-          # umask 000: pytest temp dirs/files created world-accessible (0777/0666)
-          # so Docker containers running as any uid can read/write them even with
-          # --cap-drop=ALL (which removes CAP_DAC_OVERRIDE, preventing uid 0
-          # from bypassing file permissions owned by the runner uid).
+          # pytest's root tmpdir is created via tempfile.mkdtemp() which forces 0700
+          # regardless of umask. Docker containers with --cap-drop=ALL lose
+          # CAP_DAC_OVERRIDE and cannot traverse a 0700 dir owned by another uid.
+          # Solution: pre-create a 0777 basetemp and point pytest at it. With
+          # umask 000, all subdirs/files pytest creates within it will also be 0777/0666.
+          mkdir -p /tmp/spicemcp-pytest
+          chmod 777 /tmp/spicemcp-pytest
           umask 000
-          uv run pytest tests/integration -v
+          uv run pytest tests/integration -v --basetemp=/tmp/spicemcp-pytest
