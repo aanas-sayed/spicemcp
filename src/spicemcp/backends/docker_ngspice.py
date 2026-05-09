@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
 from spicelib.sim.simulator import Simulator, SpiceSimulatorError, run_function
+
+
+def _host_user() -> str | None:
+    """Return 'uid:gid' of the host process, or None on platforms without getuid."""
+    if hasattr(os, "getuid") and hasattr(os, "getgid"):
+        return f"{os.getuid()}:{os.getgid()}"
+    return None
 
 
 class DockerNGspice(Simulator):
@@ -60,10 +68,15 @@ class DockerNGspice(Simulator):
             "--memory=2g",
             "--cpus=2",
             "--pids-limit=256",
-            "--user=1000:1000",
             "-v",
             f"{work_dir}:/sim:rw",
         ]
+
+        # Match container uid to host user so output files are owned correctly
+        # and we can read/write the bind mount under --cap-drop=ALL.
+        host_user = _host_user()
+        if host_user is not None:
+            cmd.extend([f"--user={host_user}"])
 
         for mount in cls._model_mounts:
             cmd.extend(["-v", f"{mount['host']}:{mount['container']}:ro"])
