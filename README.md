@@ -1,6 +1,9 @@
 # SpiceMCP
 
-MCP server for SPICE circuit simulations. Lets LLMs write and simulate SPICE netlists, read structured results, and iterate on designs — without touching raw output files.
+> [!WARNING]
+> **This project is not yet ready for use.** It is under active development; APIs, configuration, and behaviour may change without notice. Don't depend on it yet.
+
+MCP server for SPICE circuit simulations. Lets LLMs write and simulate SPICE netlists, read structured results, and iterate on designs - without touching raw output files.
 
 ## Requirements
 
@@ -54,8 +57,8 @@ SpiceMCP looks for `~/.config/spicemcp/config.json` (or set `SPICEMCP_CONFIG`):
 ```json
 {
   "simulators": {
-    "ltspice": { "backend": "docker", "image": "aanas-sayed/docker-ltspice:latest", "timeout_s": 300 },
-    "ngspice":  { "backend": "docker", "image": "aanas-sayed/docker-ngspice:latest", "timeout_s": 300 }
+    "ltspice": { "backend": "docker", "image": "aanas0sayed/docker-ltspice:latest", "timeout_s": 300 },
+    "ngspice":  { "backend": "docker", "image": "aanas0sayed/docker-ngspice:latest", "timeout_s": 300 }
   },
   "model_dirs": ["/path/to/your/models"],
   "session_ttl_minutes": 10,
