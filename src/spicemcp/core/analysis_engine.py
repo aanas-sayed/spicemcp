@@ -382,13 +382,14 @@ def measure_signal(
 
 
 def parse_meas_results(log_path: Path) -> dict[str, Any]:
-    """Parse .MEAS results from an LTSpice log file.
+    """Parse .MEAS results from a SPICE log file.
 
     Returns a dict mapping measure name to value (or list of values for stepped sims).
+    Returns an empty dict if the log format is not recognised (e.g. ngspice logs).
     """
-    reader = LTSpiceLogReader(str(log_path), read_measures=True)
     results: dict[str, Any] = {}
     try:
+        reader = LTSpiceLogReader(str(log_path), read_measures=True)
         meas_names = reader.get_measure_names()
     except Exception:
         return results
