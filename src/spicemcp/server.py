@@ -116,6 +116,94 @@ def list_sessions() -> dict[str, Any]:
 
 
 @mcp.tool()
+def measure_signal(
+    session_id: str,
+    measurements: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Run a batch of measurements against a session's raw file.
+
+    Each measurement is a dict:
+      - operation: 'stats' | 'crossing' | 'power'
+      - signal: trace name (for stats and crossing)
+      - signals: [V_signal, I_signal] (for power)
+      - x_start, x_end: optional window (time/freq/sweep depending on domain)
+      - step: optional step index, default 0
+      - threshold, edge ('rising'|'falling'|'either'), n, hysteresis: for crossing
+
+    Returns {'results': [...], 'error': null/string}. Results are returned in
+    the same order as input measurements; per-result errors are surfaced in
+    that result's 'error' key.
+    """
+    from spicemcp.tools.measure import measure_signal as _run
+
+    return _run(session_id=session_id, measurements=measurements)
+
+
+@mcp.tool()
+def plot_signals(
+    session_id: str,
+    signals: list[str],
+    x_start: float | None = None,
+    x_end: float | None = None,
+    step: int = 0,
+    overlay_steps: bool = False,
+    title: str = "",
+    format: str = "png",
+) -> dict[str, Any]:
+    """Plot signals from a session's raw file.
+
+    AC simulations auto-render as Bode plots (gain + phase subplots, log x).
+    Transient/DC plots put V signals on the left axis and I signals dashed
+    on the right axis. format: 'png' | 'html' | 'both' (HTML needs plotly).
+    """
+    from spicemcp.tools.plot import plot_signals as _run
+
+    return _run(
+        session_id=session_id,
+        signals=signals,
+        x_start=x_start,
+        x_end=x_end,
+        step=step,
+        overlay_steps=overlay_steps,
+        title=title,
+        format=format,
+    )
+
+
+@mcp.tool()
+def modify_netlist(
+    session_id: str,
+    changes: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Apply a batch of netlist edits via spicelib's SpiceEditor.
+
+    Each change is a dict:
+      - {type: 'component', ref: 'R1', value: '4.7k'}
+      - {type: 'parameter', ref: 'Vdd', value: '5'}
+      - {type: 'model', ref: 'D1', value: '1N4148'}
+      - {type: 'instruction', ref: '.tran 10u', action: 'add' | 'remove'}
+
+    Sets simulation_required on the session - measure_signal and plot_signals
+    will return an error until simulate is called again.
+    """
+    from spicemcp.tools.netlist import modify_netlist as _run
+
+    return _run(session_id=session_id, changes=changes)
+
+
+@mcp.tool()
+def list_models(search: str = "") -> dict[str, Any]:
+    """List model files in configured model_dirs, optionally filtered by 'search'.
+
+    Substring match (case-insensitive) on filename. Returns close-name
+    suggestions when the search term has no direct matches.
+    """
+    from spicemcp.tools.models import list_models as _run
+
+    return _run(search=search)
+
+
+@mcp.tool()
 def cleanup_session(
     session_id: str,
     keep_log: bool = True,
